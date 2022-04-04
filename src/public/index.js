@@ -1,6 +1,8 @@
 let socket = io();
 let chatBox = document.getElementById('chatBox');
-let log = document.getElementById('log');
+let divChat = document.getElementById('chat');
+let divChatAndInput = document.getElementById('chatAndInput');
+// let log = document.getElementById('log');
 
 let user;
 
@@ -22,8 +24,9 @@ chatBox.addEventListener('keyup', (evt) => {
     if (chatBox.value.trim().length > 0) {
       // por lo menos se envia un simbolo
       socket.emit('sendMessage', {
-        user,
+        user: user,
         message: chatBox.value.trim(),
+        time: `${new Date().getHours()}:${new Date().getMinutes()}`,
       });
       chatBox.value = '';
     }
@@ -34,7 +37,16 @@ chatBox.addEventListener('keyup', (evt) => {
 socket.on('log', (data) => {
   let messages = '';
   data.forEach((log) => {
-    messages = messages + `${log.user}dice: ${log.message}<br>`;
+    if (user === log.user) {
+      messages += `<div id="myMessages" class="myMessages">
+                      <p id="log" class="pMessage"> ${log.user}: ${log.message}  <small>${log.time}</small> </p>
+                  </div>`;
+    } else {
+      messages += `
+                  <div id="messages" class="messages" >
+                  <p id="log" class="pMessage"> ${log.user}: ${log.message}  <small>${log.time}</small> </p>
+                  </div>`;
+    }
   });
-  log.innerHTML = messages;
+  divChat.innerHTML = messages;
 });
